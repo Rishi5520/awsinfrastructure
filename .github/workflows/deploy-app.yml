@@ -1,9 +1,9 @@
-name: Deploy Terraform Infra
+name: Deploy Application
 
 on:
   push:
     branches:
-      - Master  
+      - master      
 
 jobs:
   deploy:
@@ -20,13 +20,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: latest
-
-      - name: Initialize Terraform
-        run: terraform init
-
-      - name: Apply Terraform Changes
-        run: terraform apply -auto-approve
+      - name: Deploy to AWS CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name MyApp \
+            --deployment-group-name MyDeploymentGroup \
+            --github-location repository=your-username/your-repo,commitId=${{ github.sha }}
